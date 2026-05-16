@@ -1,0 +1,25 @@
+.box-outer {
+  min-width: 360px;
+  overflow-x: auto;
+}
+
+.box {
+  --grid-gap: 0px;
+  --box-height: calc(60px + var(--grid-gap));
+  --box-padding: 10px 20px 10px 20px;
+  --box-row-height: calc((var(--box-height) - var(--grid-gap)) / 2);
+  box-sizing: border-box; 
+  height: var(--box-height);
+  /* padding: var(--box-padding); */
+  background-color: #b9b9b8;
+  margin: 0 auto;
+  min-width: 320px;
+  max-width: 500px;
+}
+
+.box-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, var(--box-row-height));
+  gap: var(--grid-gap);
+}

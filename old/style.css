@@ -9,7 +9,7 @@
   --box-padding: 10px 20px 10px 20px;
   --box-row-height: calc((var(--box-height) - var(--grid-gap)) / 2);
   height: var(--box-height);
-  padding: var(--box-padding);
+  padding: 0;
   background-color: #b9b9b8;
   margin: 0 auto;
   min-width: 320px;
