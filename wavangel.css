@@ -1,5 +1,5 @@
 .box-outer {
-  min-width: 360px;
+  min-width: 320px;
   overflow-x: auto;
 }
 
@@ -22,4 +22,33 @@
   grid-template-columns: 1fr;
   grid-template-rows: repeat(2, var(--box-row-height));
   gap: var(--grid-gap);
+}
+
+.top-row-grid {
+  display: grid;
+  grid-template-columns: var(--box-row-height) 1fr var(--box-row-height) var(--box-row-height);
+  grid-template-rows: 1fr;
+  width: 100%;
+}
+
+.bottom-row-grid {
+  display: grid;
+  grid-template-columns: 1fr calc(var(--box-row-height) * 2);
+  grid-template-rows: 1fr;
+  width: 100%;
+}
+
+.box-grid > div {
+  box-sizing: border-box;
+  border: 1px solid black;
+}
+
+.top-row-grid > div {
+  box-sizing: border-box;
+  border: 1px solid red;
+}
+
+.bottom-row-grid > div {
+  box-sizing: border-box;
+  border: 1px solid red;
 }
