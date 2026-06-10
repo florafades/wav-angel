@@ -1,42 +1,67 @@
 .box-outer {
-  min-width: 320px;
   overflow-x: auto;
 }
 
 .box {
-  --top-row-height: 44px;
-  --bottom-row-height: 32px;
+  --top-row-height: 45px;
+  --bottom-row-height: 45px;
   --grid-gap: 0px;
   --box-height: calc(var(--top-row-height) + var(--bottom-row-height) + var(--grid-gap));
   --box-padding: 10px 20px 10px 20px;
   --box-row-height: calc((var(--box-height) - var(--grid-gap)) / 2);
   --cell-padding: 2px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   height: var(--box-height);
   /* padding: var(--box-padding); */
   background-color: #b9b9b8;
+  /* border drawn as four painted lines, each stopping 1px short of the
+     corners — the corner pixels stay box-colored (pixel-art rounding) */
+  background-image:
+    linear-gradient(#4a4848, #4a4848),  /* top */
+    linear-gradient(#4a4848, #4a4848),  /* bottom */
+    linear-gradient(#4a4848, #4a4848),  /* left */
+    linear-gradient(#4a4848, #4a4848);  /* right */
+  background-repeat: no-repeat;
+  background-size:
+    calc(100% - 2px) 1px,
+    calc(100% - 2px) 1px,
+    1px calc(100% - 2px),
+    1px calc(100% - 2px);
+  background-position:
+    1px 0,
+    1px 100%,
+    0 1px,
+    100% 1px;
+  /* clip the box fill out of the 1px corner notches */
+  clip-path: polygon(
+    0 1px, 1px 1px, 1px 0,
+    calc(100% - 1px) 0, calc(100% - 1px) 1px, 100% 1px,
+    100% calc(100% - 1px), calc(100% - 1px) calc(100% - 1px), calc(100% - 1px) 100%,
+    1px 100%, 1px calc(100% - 1px), 0 calc(100% - 1px)
+  );
   margin: 0 auto;
-  min-width: 320px;
+  min-width: 200px;
   max-width: 500px;
+  padding-left: 5px;
 }
 
 .box-grid {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 44px var(--bottom-row-height);
+  grid-template-rows: 45px var(--bottom-row-height);
   gap: var(--grid-gap);
 }
 
 .top-row-grid {
   display: grid;
-  grid-template-columns: 44px 1fr 44px 44px;
+  grid-template-columns: 45px 1fr 45px 45px;
   grid-template-rows: 1fr;
   width: 100%;
 }
 
 .bottom-row-grid {
   display: grid;
-  grid-template-columns: 1fr 88px;
+  grid-template-columns: 1fr 90px;
   grid-template-rows: 1fr;
   width: 100%;
 }
@@ -44,21 +69,21 @@
 .box-grid > div {
   box-sizing: border-box;
 
-  
+
 }
 
 .top-row-grid > div {
   box-sizing: border-box;
 
-  padding: 4px;
- 
+  padding: 5px 5px 0 0;
+
 }
 
 .bottom-row-grid > div {
   box-sizing: border-box;
 
-  padding: 2px 4px 4px 4px;
- 
+  padding: 5px 5px 5px 0;
+
 }
 
 
@@ -68,9 +93,39 @@
   border: 1px solid #4a4848;
   width: 100%;
   height: 100%;
-   border-radius: 15px;
+   /* border-radius: 15px; */
    justify-content: center;
 text-align: center;
+}
+
+.marquee-viewport {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+#marquee {
+  display: inline-block;
+  white-space: nowrap;
+  /* start fully off the right edge so the loop has a gap */
+  padding-left: 100%;
+  animation: marquee-scroll 10s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.btn-icon {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.cell:has(.btn-icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cell-2 {
@@ -78,4 +133,93 @@ text-align: center;
   width: 100%;
   height: 100%;
    background-color: rgb(206, 210, 209);
+}
+
+.time-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-track {
+  --progress: 0%;
+  --tab-size: 14px;
+  box-sizing: border-box;
+  position: relative;
+  height: 10px;
+  margin: 0 auto;
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc(100% - 10px);
+  touch-action: none;
+}
+
+/* track visuals live on a pseudo-element so its corner clip
+   doesn't cut the overhanging tab (clip-path clips children) */
+.progress-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #8a8d8c;
+  /* same pixel-art corner treatment as .box: painted 1px lines that stop
+     short of the corners, with the corner pixels clipped out */
+  background-image:
+    linear-gradient(#4a4848, #4a4848),  /* top */
+    linear-gradient(#4a4848, #4a4848),  /* bottom */
+    linear-gradient(#4a4848, #4a4848),  /* left */
+    linear-gradient(#4a4848, #4a4848);  /* right */
+  background-repeat: no-repeat;
+  background-size:
+    calc(100% - 2px) 1px,
+    calc(100% - 2px) 1px,
+    1px calc(100% - 2px),
+    1px calc(100% - 2px);
+  background-position:
+    1px 0,
+    1px 100%,
+    0 1px,
+    100% 1px;
+  clip-path: polygon(
+    0 1px, 1px 1px, 1px 0,
+    calc(100% - 1px) 0, calc(100% - 1px) 1px, 100% 1px,
+    100% calc(100% - 1px), calc(100% - 1px) calc(100% - 1px), calc(100% - 1px) 100%,
+    1px 100%, 1px calc(100% - 1px), 0 calc(100% - 1px)
+  );
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 1px;
+  width: var(--progress);
+  max-width: calc(100% - 2px);
+  background-color: #4a4848;
+}
+
+.progress-tab {
+  /* stepped "rounded" corners: 2px then 1px ladder, pixel-art style */
+  --pixel-corners: polygon(
+    0 3px, 1px 3px, 1px 1px, 3px 1px, 3px 0,
+    calc(100% - 3px) 0, calc(100% - 3px) 1px, calc(100% - 1px) 1px, calc(100% - 1px) 3px, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 1px) calc(100% - 3px), calc(100% - 1px) calc(100% - 1px), calc(100% - 3px) calc(100% - 1px), calc(100% - 3px) 100%,
+    3px 100%, 3px calc(100% - 1px), 1px calc(100% - 1px), 1px calc(100% - 3px), 0 calc(100% - 3px)
+  );
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  /* center on the progress point, but never overhang the track ends */
+  left: clamp(13px, var(--progress), calc(100% - 13px));
+  width: 26px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  /* dark layer acts as the 1px border, since a real border's corners get clipped */
+  background-color: #4a4848;
+  clip-path: var(--pixel-corners);
+}
+
+.progress-tab::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background-color: #ffffff;
+  clip-path: var(--pixel-corners);
 }

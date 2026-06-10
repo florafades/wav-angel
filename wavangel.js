@@ -6,11 +6,11 @@ const songs = [
 
 let currentIndex = 0;
 const audio = new Audio();
-const marquee = document.getElementById("marquee");
 const playPauseBtn = document.getElementById("play-pause-btn");
-const playPauseIcon = playPauseBtn.querySelector(".button-icon");
-const progressBar = document.getElementById("progress-bar");
+const playPauseIcon = playPauseBtn.querySelector(".btn-icon");
+const marquee = document.getElementById("marquee");
 const timeDisplay = document.getElementById("time-display");
+const progressBar = document.getElementById("progress-bar");
 
 function updateMarquee(index) {
   marquee.textContent = songs[index].title;
@@ -18,19 +18,17 @@ function updateMarquee(index) {
 
 function updateTimeDisplay() {
   const currentTime = Math.floor(audio.currentTime);
-  const duration = Math.floor(audio.duration) || 0;
-  
+
   const currentMin = Math.floor(currentTime / 60);
   const currentSec = currentTime % 60;
-  const durationMin = Math.floor(duration / 60);
-  const durationSec = duration % 60;
-  
-  timeDisplay.textContent = `${currentMin}:${currentSec.toString().padStart(2, '0')} / ${durationMin}:${durationSec.toString().padStart(2, '0')}`;
+
+  timeDisplay.textContent = `${currentMin.toString().padStart(2, '0')}:${currentSec.toString().padStart(2, '0')}`;
 }
 
 function updateProgressBar() {
   if (audio.duration) {
-    progressBar.value = (audio.currentTime / audio.duration) * 100;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    progressBar.style.setProperty("--progress", `${pct}%`);
   }
 }
 
@@ -43,43 +41,39 @@ function loadSong(index) {
 function togglePlayPause() {
   if (audio.paused) {
     audio.play().then(() => {
-      playPauseIcon.textContent = "⏸";
+      playPauseIcon.src = "pause.png";
       console.log(`Playing: ${songs[currentIndex].title}`);
     }).catch((error) => {
       console.error("Playback error:", error);
     });
   } else {
     audio.pause();
-    playPauseIcon.textContent = "▶";
+    playPauseIcon.src = "play.png";
   }
 }
 
 function nextSong() {
-  const wasPlaying = !audio.paused;
   currentIndex = (currentIndex + 1) % songs.length;
   loadSong(currentIndex);
-  
-  if (wasPlaying) {
-    audio.play().then(() => {
-      playPauseIcon.textContent = "⏸";
-    }).catch((error) => {
-      console.error("Playback error:", error);
-    });
-  }
+
+  // always start playback, even from a paused state
+  audio.play().then(() => {
+    playPauseIcon.src = "pause.png";
+  }).catch((error) => {
+    console.error("Playback error:", error);
+  });
 }
 
 function prevSong() {
-  const wasPlaying = !audio.paused;
   currentIndex = (currentIndex - 1 + songs.length) % songs.length;
   loadSong(currentIndex);
-  
-  if (wasPlaying) {
-    audio.play().then(() => {
-      playPauseIcon.textContent = "⏸";
-    }).catch((error) => {
-      console.error("Playback error:", error);
-    });
-  }
+
+  // always start playback, even from a paused state
+  audio.play().then(() => {
+    playPauseIcon.src = "pause.png";
+  }).catch((error) => {
+    console.error("Playback error:", error);
+  });
 }
 
 // Button wiring
@@ -87,10 +81,24 @@ playPauseBtn.addEventListener("click", togglePlayPause);
 document.getElementById("next-btn").addEventListener("click", nextSong);
 document.getElementById("prev-btn").addEventListener("click", prevSong);
 
-// Progress bar seek
-progressBar.addEventListener("input", (e) => {
-  const seekTime = (e.target.value / 100) * audio.duration;
-  audio.currentTime = seekTime;
+// Progress bar seek: click or drag anywhere on the track
+function seekFromPointer(e) {
+  if (!audio.duration) return;
+  const rect = progressBar.getBoundingClientRect();
+  const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+  audio.currentTime = ratio * audio.duration;
+  updateProgressBar();
+}
+
+progressBar.addEventListener("pointerdown", (e) => {
+  progressBar.setPointerCapture(e.pointerId);
+  seekFromPointer(e);
+});
+
+progressBar.addEventListener("pointermove", (e) => {
+  if (progressBar.hasPointerCapture(e.pointerId)) {
+    seekFromPointer(e);
+  }
 });
 
 // Audio event listeners

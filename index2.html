@@ -12,30 +12,38 @@
   <div class="box">
     <div class="box-grid">
       <div class="top-row-grid">
-        <div>
+        <div id="play-pause-btn">
             <div class="cell">
+                <img class="btn-icon" src="play.png" alt="Play">
             </div>
         </div>
         <div>
-            <div class="cell">
-                flora fades - amber amber fawn
+            <div class="cell marquee-viewport">
+                <span id="marquee"></span>
             </div>
         </div>
-        <div>
+        <div id="prev-btn">
             <div class="cell">
+                <img class="btn-icon" src="previous.png" alt="Previous">
             </div>
         </div>
-        <div>
+        <div id="next-btn">
             <div class="cell">
+                <img class="btn-icon" src="next.png" alt="Next">
             </div>
         </div>
       </div>
       <div class="bottom-row-grid">
         <div>
             <div class="cell-2">
+                <div class="progress-track" id="progress-bar">
+                    <div class="progress-fill"></div>
+                    <div class="progress-tab"></div>
+                </div>
             </div>
         </div>
-        <div><div class="cell-2">
+        <div><div class="cell-2 time-cell">
+                <span id="time-display"></span>
             </div>
         </div>
       </div>
