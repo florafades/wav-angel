@@ -1,5 +1,21 @@
+@font-face {
+  font-family: "Pixel Operator";
+  src: url("PixelOperator.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Pixel Operator Mono";
+  src: url("PixelOperatorMono.ttf") format("truetype");
+}
+
 .box-outer {
   overflow-x: auto;
+}
+
+.box {
+  /* native size is 16px — keep font-size at integer multiples of 16 */
+  font-family: "Pixel Operator", monospace;
+  font-size: 16px;
 }
 
 .box {
@@ -40,7 +56,7 @@
     1px 100%, 1px calc(100% - 1px), 0 calc(100% - 1px)
   );
   margin: 0 auto;
-  min-width: 150px;
+  min-width: 100px;
   max-width: 400px;
   padding-left: 5px;
 }
@@ -74,6 +90,9 @@
 
 .top-row-grid > div {
   box-sizing: border-box;
+  /* let cells shrink below their content so overflow:hidden can clip
+     the marquee instead of the text forcing the 1fr track wider */
+  min-width: 0;
 
   padding: 5px 5px 0 0;
 
@@ -99,22 +118,22 @@ text-align: center;
 }
 
 .marquee-viewport {
+  /* mono: every glyph the same width, so the column math is exact */
+  font-family: "Pixel Operator Mono", monospace;
   overflow: hidden;
   display: flex;
   align-items: center;
+  /* override .cell's centering — the scrolling text must stay
+     pinned to the left edge as it shortens near the end of a pass */
+  justify-content: flex-start;
+  text-align: left;
 }
 
 #marquee {
   display: inline-block;
-  white-space: nowrap;
-  /* start fully off the right edge so the loop has a gap */
-  padding-left: 100%;
-  animation: marquee-scroll 10s linear infinite;
-}
-
-@keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-100%); }
+  /* pre = no wrapping AND the rotating gap spaces don't collapse */
+  white-space: pre;
+  text-transform: uppercase;
 }
 
 .btn-icon {
@@ -139,6 +158,8 @@ text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* 2× the 8px native size — still on the pixel grid */
+  font-size: 16px;
 }
 
 .progress-track {

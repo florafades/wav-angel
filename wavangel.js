@@ -12,9 +12,50 @@ const marquee = document.getElementById("marquee");
 const timeDisplay = document.getElementById("time-display");
 const progressBar = document.getElementById("progress-bar");
 
-function updateMarquee(index) {
-  marquee.textContent = songs[index].title;
+// character-cell marquee: like a hardware dot-matrix display, the text
+// never moves — the string itself rotates one character per tick, so
+// every frame is a static, pixel-crisp render
+const MARQUEE_TICK_MS = 250;
+let marqueeText = "";
+let marqueeOffset = 0;
+let marqueeCols = 1;
+
+// how many character cells fit across the marquee viewport,
+// using the average glyph width of the loaded font
+function measureMarqueeCols() {
+  const probe = document.createElement("span");
+  probe.style.visibility = "hidden";
+  probe.style.whiteSpace = "pre";
+  probe.textContent = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+  marquee.parentElement.appendChild(probe);
+  const avgCharWidth = probe.offsetWidth / probe.textContent.length;
+  probe.remove();
+  return Math.max(1, Math.floor(marquee.parentElement.clientWidth / avgCharWidth));
 }
+
+function renderMarquee() {
+  // no right-hand bound: the cell's overflow:hidden crops the right edge
+  // pixel-exactly, so the text truly spans the full cell width
+  marquee.textContent = marqueeText.slice(marqueeOffset);
+}
+
+function updateMarquee(index) {
+  marqueeCols = measureMarqueeCols();
+  // lead-in spaces cover the cell, so the title enters at the right edge
+  marqueeText = " ".repeat(marqueeCols + 1) + songs[index].title;
+  marqueeOffset = 0;
+  renderMarquee();
+}
+
+setInterval(() => {
+  marqueeOffset += 1;
+  // past the end = title fully exited left; restart with the next
+  // pass's first char already at the right edge
+  if (marqueeOffset > marqueeText.length) {
+    marqueeOffset = 1;
+  }
+  renderMarquee();
+}, MARQUEE_TICK_MS);
 
 function updateTimeDisplay() {
   const currentTime = Math.floor(audio.currentTime);
@@ -117,3 +158,11 @@ audio.addEventListener("ended", () => {
 
 // Load first song on startup (but don't play)
 loadSong(currentIndex);
+
+// re-measure the marquee once the pixel font has actually loaded
+document.fonts.ready.then(() => updateMarquee(currentIndex));
+
+// re-measure when the flexible player width changes, so the lead-in
+// padding always matches the current cell width
+new ResizeObserver(() => updateMarquee(currentIndex))
+  .observe(marquee.parentElement);
